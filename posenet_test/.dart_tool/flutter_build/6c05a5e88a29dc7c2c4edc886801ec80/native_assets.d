@@ -1,0 +1,1 @@
+ /Users/techfin/Documents/Personal/posenet_test/.dart_tool/flutter_build/6c05a5e88a29dc7c2c4edc886801ec80/native_assets.yaml: 
