@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:image_editor/home.dart';
 import 'package:image_editor/image_editor/image_editor_plus.dart';
+import 'package:image_editor/main.dart';
 import 'package:image_editor_plus/data/layer.dart';
 // import 'package:image_editor_plus/image_editor_plus.dart';
 

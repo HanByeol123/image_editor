@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:image_editor/home.dart';
 import 'package:image_editor/image_editor/layers_viewer/image_layer_overlay.dart';
+import 'package:image_editor/main.dart';
 import 'package:image_editor_plus/data/layer.dart';
 
 /// Image layer that can be used to add overlay images and drawings
@@ -71,29 +71,31 @@ class _ImageLayerState extends State<ImageLayer> {
                 setState(() {});
               }
             : null,
-        child: Transform(
-          transform: Matrix4(
-            1,
-            0,
-            0,
-            0,
-            0,
-            1,
-            0,
-            0,
-            0,
-            0,
-            1,
-            0,
-            0,
-            1,
-            0,
-            1 / widget.layerData.scale,
-          ),
-          child: SizedBox(
-            width: widget.layerData.image.width.toDouble(),
-            height: widget.layerData.image.height.toDouble(),
-            child: Image.memory(widget.layerData.image.bytes),
+        child: selectedFilterColor.build(
+          Transform(
+            transform: Matrix4(
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              1 / widget.layerData.scale,
+            ),
+            child: SizedBox(
+              width: widget.layerData.image.width.toDouble(),
+              height: widget.layerData.image.height.toDouble(),
+              child: Image.memory(widget.layerData.image.bytes),
+            ),
           ),
         ),
       ),

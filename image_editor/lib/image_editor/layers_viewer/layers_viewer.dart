@@ -3,6 +3,7 @@ import 'package:image_editor/image_editor/layers_viewer/emoji_layer.dart';
 import 'package:image_editor/image_editor/layers_viewer/image_layer.dart';
 import 'package:image_editor/image_editor/layers_viewer/text_layer.dart';
 import 'package:image_editor/image_editor/single_image_editor.dart';
+import 'package:image_editor/main.dart';
 import 'package:image_editor_plus/data/layer.dart';
 import 'package:image_editor_plus/layers/background_layer.dart';
 
@@ -25,10 +26,12 @@ class LayersViewer extends StatelessWidget {
       children: layers.map((layerItem) {
         // Background layer
         if (layerItem is BackgroundLayerData) {
-          return BackgroundLayer(
-            layerData: layerItem,
-            onUpdate: onUpdate,
-            editable: editable,
+          return selectedFilterColor.build(
+            BackgroundLayer(
+              layerData: layerItem,
+              onUpdate: onUpdate,
+              editable: editable,
+            ),
           );
         }
         // if (layerItem is FilterLayerData) {

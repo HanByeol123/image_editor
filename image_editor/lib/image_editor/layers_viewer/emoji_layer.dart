@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:image_editor/home.dart';
 import 'package:image_editor/image_editor/layers_viewer/emoji_layer_overlay.dart';
+import 'package:image_editor/main.dart';
 import 'package:image_editor_plus/data/layer.dart';
 
 /// Emoji layer
@@ -71,14 +71,16 @@ class _EmojiLayerState extends State<EmojiLayer> {
                 setState(() {});
               }
             : null,
-        child: Transform.rotate(
-          angle: widget.layerData.rotation,
-          child: Container(
-            padding: const EdgeInsets.all(64),
-            child: Text(
-              widget.layerData.text.toString(),
-              style: TextStyle(
-                fontSize: widget.layerData.size,
+        child: selectedFilterColor.build(
+          Transform.rotate(
+            angle: widget.layerData.rotation,
+            child: Container(
+              padding: const EdgeInsets.all(64),
+              child: Text(
+                widget.layerData.text.toString(),
+                style: TextStyle(
+                  fontSize: widget.layerData.size,
+                ),
               ),
             ),
           ),
