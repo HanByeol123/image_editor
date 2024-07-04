@@ -9,6 +9,11 @@ import 'package:image_editor/image_editor/layers_viewer/text_layer_overlay.dart'
 import 'package:image_editor/image_editor/single_image_editor.dart';
 import 'package:image_editor_plus/data/layer.dart';
 import 'package:image_editor_plus/loading_screen.dart';
+// import 'package:image_editor_plus/data/layer.dart';
+// import 'package:image_editor_plus/loading_screen.dart';
+// import 'package:image_editor_plus/modules/emoji_layer_overlay.dart';
+// import 'package:image_editor_plus/modules/image_layer_overlay.dart';
+// import 'package:image_editor_plus/modules/text_layer_overlay.dart';
 import 'package:reorderables/reorderables.dart';
 
 class ManageLayersOverlay extends StatefulWidget {
@@ -209,9 +214,9 @@ class _ManageLayersOverlayState extends State<ManageLayersOverlay> {
                         width: 64,
                         height: 64,
                         child: Center(
-                          child: layer is TextLayerData || layer is EmojiLayerData
+                          child: layer is TextFieldLayerData || layer is TextLayerData || layer is EmojiLayerData
                               ? Text(
-                                  layer is TextLayerData ? 'T' : (layer as EmojiLayerData).text,
+                                  (layer is TextFieldLayerData || layer is TextLayerData) ? 'T' : (layer as EmojiLayerData).text,
                                   style: const TextStyle(
                                     fontSize: 32,
                                     color: Colors.white,
@@ -262,8 +267,13 @@ class _ManageLayersOverlayState extends State<ManageLayersOverlay> {
                   GestureDetector(
                     key: Key('${_layers.indexOf(layer)}:${layer.runtimeType}'),
                     onTap: () {
-                      // 백그라운드와 필터는 수정 사항이 없으므로 바로 리턴
                       if (layer is BackgroundLayerData || layer is FilterLayerData) return;
+
+                      if (layer is TextFieldLayerData) {
+                        Navigator.pop(context);
+                        layer.focusNode.requestFocus();
+                        return;
+                      }
 
                       showModalBottomSheet(
                         shape: const RoundedRectangleBorder(
@@ -276,7 +286,6 @@ class _ManageLayersOverlayState extends State<ManageLayersOverlay> {
                         backgroundColor: Colors.transparent,
                         builder: (context) {
                           if (layer is EmojiLayerData) {
-                            // 이모티콘
                             return EmojiLayerOverlay(
                               index: _layers.indexOf(layer),
                               layer: layer,
@@ -288,7 +297,6 @@ class _ManageLayersOverlayState extends State<ManageLayersOverlay> {
                           }
 
                           if (layer is ImageLayerData) {
-                            // 사진
                             return ImageLayerOverlay(
                               index: _layers.indexOf(layer),
                               layerData: layer,
@@ -300,7 +308,6 @@ class _ManageLayersOverlayState extends State<ManageLayersOverlay> {
                           }
 
                           if (layer is TextLayerData) {
-                            // 텍스트
                             return TextLayerOverlay(
                               index: _layers.indexOf(layer),
                               layer: layer,
@@ -322,70 +329,68 @@ class _ManageLayersOverlayState extends State<ManageLayersOverlay> {
                         color: Colors.white10,
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: Row(
-                        children: [
-                          SizedBox(
-                            width: 64,
-                            height: 64,
-                            child: Center(
-                              child: layer is TextLayerData || layer is EmojiLayerData
-                                  ? Text(
-                                      layer is TextLayerData ? 'T' : (layer as EmojiLayerData).text,
-                                      style: const TextStyle(
-                                        fontSize: 32,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w100,
-                                      ),
-                                    )
-                                  : _buildImageLayerWidget(layer),
-                            ),
+                      child: Row(children: [
+                        SizedBox(
+                          width: 64,
+                          height: 64,
+                          child: Center(
+                            child: layer is TextFieldLayerData || layer is TextLayerData || layer is EmojiLayerData
+                                ? Text(
+                                    (layer is TextFieldLayerData || layer is TextLayerData) ? 'T' : (layer as EmojiLayerData).text,
+                                    style: const TextStyle(
+                                      fontSize: 32,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w100,
+                                    ),
+                                  )
+                                : _buildImageLayerWidget(layer),
                           ),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width - 92 - 64,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (layer is LinkLayerData)
-                                  Text(
-                                    layer.text,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                else if (layer is TextLayerData)
-                                  Text(
-                                    layer.text,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                else
-                                  Text(
-                                    layer.runtimeType.toString().replaceAll('LayerData', ''),
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                    ),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width - 92 - 64,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (layer is LinkLayerData)
+                                Text(
+                                  layer.text,
+                                  style: const TextStyle(
+                                    color: Colors.white,
                                   ),
-                              ],
-                            ),
+                                )
+                              else if (layer is TextLayerData)
+                                Text(
+                                  layer.text,
+                                  // layer.runtimeType.toString(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                )
+                              else
+                                Text(
+                                  layer.runtimeType.toString().replaceAll('LayerData', ''),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                            ],
                           ),
-                          if (layer is! BackgroundLayerData) ...[
-                            // 백그라운드를 제외한 나머지 레이어 삭제 기능
-                            IconButton(
-                              onPressed: () {
-                                _layers.remove(layer);
-                                widget.onUpdate();
-                                setState(() {});
-                              },
-                              icon: const Icon(
-                                Icons.delete,
-                                size: 22,
-                                color: Colors.red,
-                              ),
-                            )
-                          ]
-                        ],
-                      ),
+                        ),
+                        if (layer is! BackgroundLayerData) ...[
+                          IconButton(
+                            onPressed: () {
+                              _layers.remove(layer);
+                              widget.onUpdate();
+                              setState(() {});
+                            },
+                            icon: const Icon(
+                              Icons.delete,
+                              size: 22,
+                              color: Colors.red,
+                            ),
+                          )
+                        ]
+                      ]),
                     ),
                   ),
               ],

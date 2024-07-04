@@ -1,21 +1,21 @@
-// ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously, type_literal_in_constant_pattern
+// ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously
 
 import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:colorfilter_generator/colorfilter_generator.dart';
-import 'package:colorfilter_generator/presets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image/image.dart' as img;
+import 'package:image_editor/home.dart';
+// import 'package:image_editor/home.dart';
 import 'package:image_editor/image_editor/edit_options/image_crop.dart';
 import 'package:image_editor/image_editor/edit_options/image_filter.dart';
 import 'package:image_editor/image_editor/edit_options/options.dart';
 import 'package:image_editor/image_editor/image_editor_plus.dart';
 import 'package:image_editor/image_editor/layers_overlay.dart';
 import 'package:image_editor/image_editor/layers_viewer/layers_viewer.dart';
-import 'package:image_editor/main.dart';
 import 'package:image_editor_plus/data/image_item.dart';
 import 'package:image_editor_plus/data/layer.dart';
 import 'package:image_editor_plus/loading_screen.dart';
@@ -65,15 +65,14 @@ class _SingleImageEditorState extends State<SingleImageEditor> with WidgetsBindi
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addObserver(this);
 
-    if (previousLayer.isNotEmpty) {
-      // 이전에 저장한 레이어가 있을 경우
-      loadImages();
-    } else if (widget.image != null) {
-      // 이전에 저장한 레이어가 없을 경우
-      loadImage();
-    }
+    // if (userInfoProvider.layers[index].isNotEmpty) {
+    //   loadImages();
+    // } else if (widget.image != null) {
+    loadImage();
+    // }
 
     _isLoading = false;
     setState(() {});
@@ -94,77 +93,89 @@ class _SingleImageEditorState extends State<SingleImageEditor> with WidgetsBindi
     }
   }
 
-  Future<void> loadImages() async {
-    // currentImage.load: 초기 이미지를 설정해줘야 에러가 발생하지 않음
-    // 백그라운드를 초기 이미지로 설정
-    await currentImage.load((previousLayer.first as BackgroundLayerData).image.bytes);
+  // Future<void> loadImages() async {
+  //   await currentImage.load((userInfoProvider.layers[index].first as BackgroundLayerData).image.bytes);
 
-    for (int i = 0; i < previousLayer.length; i++) {
-      if (i == 0) {
-        layers.clear();
-      }
-      // 레이어를 순차적으로 추가
-      switch (previousLayer[i].runtimeType) {
-        case BackgroundLayerData:
-          layers.add(BackgroundLayerData(image: currentImage));
-          break;
-        case FilterLayerData:
-          selectedFilterColor = (previousLayer[i] as FilterLayerData).filterColor;
+  //   if (userInfoProvider.imageWidth[index] != 0 || userInfoProvider.imageHeight[index] != 0 || userInfoProvider.rotateValue[index] != 0) {
+  //     currentImage.width = userInfoProvider.imageWidth[index];
+  //     currentImage.height = userInfoProvider.imageHeight[index];
+  //     rotateValue = userInfoProvider.rotateValue[index];
+  //   }
 
-          layers.add(
-            FilterLayerData(
-              image: currentImage,
-              filterColor: (previousLayer[i] as FilterLayerData).filterColor, // 필터색
-            ),
-          );
-          break;
-        case ImageLayerData:
-          final layerData = (previousLayer[i] as ImageLayerData);
-          var imageItem = ImageItem(layerData.image.bytes);
-          await imageItem.loader.future;
-          ImageLayerData layer = ImageLayerData(
-            image: imageItem, // 이미지
-            size: layerData.size, // 이미지 사이즈
-            scale: layerData.scale, // 이미지 규모
-            rotation: layerData.rotation, // 회전된 방향
-            offset: layerData.offset, // 위치
-            opacity: layerData.opacity, // 투명도
-          );
+  //   if (userInfoProvider.flipValue[index] != 0) flipValue = userInfoProvider.flipValue[index];
 
-          layers.add(layer); // 이미지 레이터 추가
-          break;
-        case TextLayerData:
-          final layerData = (previousLayer[i] as TextLayerData);
-          TextLayerData layer = TextLayerData(
-            text: layerData.text, // 입력된 텍스트
-            align: layerData.align, // 텍스트 시작점
-            background: layerData.background, // 배경색
-            backgroundOpacity: layerData.backgroundOpacity, // 배경 투명도
-            color: layerData.color, // 텍스트색
-            offset: layerData.offset, // 위치
-            opacity: layerData.opacity, // 투명도
-            rotation: layerData.rotation, // 회전 방향
-            scale: layerData.scale, // 규모
-            size: layerData.size, // 크기
-          );
-          layers.add(layer); // 텍스트 레이어 추가
-          break;
-        case EmojiLayerData:
-          final layerData = (previousLayer[i] as EmojiLayerData);
-          EmojiLayerData layer = EmojiLayerData(
-            text: layerData.text, // 이모티콘
-            size: layerData.size, // 사이즈
-            scale: layerData.scale, // 규모
-            rotation: layerData.rotation, // 회전 방향
-            offset: layerData.offset, // 위치
-            opacity: layerData.opacity, // 투명도
-          );
-          layers.add(layer); // 이모티콘 레이어 추가
-          break;
-      }
-    }
-    setState(() {});
-  }
+  //   for (int i = 0; i < userInfoProvider.layers[index].length; i++) {
+  //     if (i == 0) {
+  //       layers.clear();
+  //       // tempLayers.clear();
+  //     }
+  //     switch (userInfoProvider.layers[index][i].runtimeType) {
+  //       case BackgroundLayerData:
+  //         layers.add(BackgroundLayerData(image: currentImage));
+  //         // tempLayers.add(BackgroundLayerData(image: currentImage));
+  //         break;
+  //       case FilterLayerData:
+  //         userInfoProvider.selectedFilterColor[index] = (userInfoProvider.layers[index][i] as FilterLayerData).filterColor;
+
+  //         layers.add(
+  //           FilterLayerData(
+  //             image: currentImage,
+  //             filterColor: (userInfoProvider.layers[index][i] as FilterLayerData).filterColor,
+  //           ),
+  //         );
+  //         // tempLayers.add(FilterLayerData(image: currentImage));
+  //         break;
+  //       case ImageLayerData:
+  //         final layerData = (userInfoProvider.layers[index][i] as ImageLayerData);
+  //         var imageItem = ImageItem(layerData.image.bytes);
+  //         await imageItem.loader.future;
+  //         ImageLayerData layer = ImageLayerData(
+  //           image: imageItem,
+  //           size: layerData.size,
+  //           scale: layerData.scale,
+  //           rotation: layerData.rotation,
+  //           offset: layerData.offset,
+  //           opacity: layerData.opacity,
+  //         );
+
+  //         layers.add(layer);
+  //         // tempLayers.add(layer);
+  //         break;
+  //       case TextLayerData:
+  //         final layerData = (userInfoProvider.layers[index][i] as TextLayerData);
+  //         TextLayerData layer = TextLayerData(
+  //           text: layerData.text,
+  //           align: layerData.align,
+  //           background: layerData.background,
+  //           backgroundOpacity: layerData.backgroundOpacity,
+  //           color: layerData.color,
+  //           offset: layerData.offset,
+  //           opacity: layerData.opacity,
+  //           rotation: layerData.rotation,
+  //           scale: layerData.scale,
+  //           size: layerData.size,
+  //         );
+  //         layers.add(layer);
+  //         // tempLayers.add(layer);
+  //         break;
+  //       case EmojiLayerData:
+  //         final layerData = (userInfoProvider.layers[index][i] as EmojiLayerData);
+  //         EmojiLayerData layer = EmojiLayerData(
+  //           text: layerData.text,
+  //           size: layerData.size,
+  //           scale: layerData.scale,
+  //           rotation: layerData.rotation,
+  //           offset: layerData.offset,
+  //           opacity: layerData.opacity,
+  //         );
+  //         layers.add(layer);
+  //         // tempLayers.add(layer);
+  //         break;
+  //     }
+  //   }
+  //   userInfoProvider.noti();
+  //   setState(() {});
+  // }
 
   Future<void> loadImage() async {
     await currentImage.load(widget.image!);
@@ -173,7 +184,6 @@ class _SingleImageEditorState extends State<SingleImageEditor> with WidgetsBindi
     setState(() {});
   }
 
-  // 확대 축소 초기화
   resetTransformation() {
     scaleFactor = 1;
     x = 0;
@@ -181,20 +191,18 @@ class _SingleImageEditorState extends State<SingleImageEditor> with WidgetsBindi
     setState(() {});
   }
 
-  // 이미지 병함
+  /// obtain image Uint8List by merging layers
   Future<Uint8List?> getMergedImage([
     OutputFormat format = OutputFormat.png,
   ]) async {
     Uint8List? image;
 
-    if (flipValue != 0 || rotateValue != 0 || layers.length > 1) {
-      image = await screenshotController.capture(pixelRatio: pixelRatio);
-    } else if (layers.length == 1) {
-      if (layers.first is BackgroundLayerData) {
-        image = (layers.first as BackgroundLayerData).image.bytes;
-      } else if (layers.first is ImageLayerData) {
-        image = (layers.first as ImageLayerData).image.bytes;
+    if (layers.length > 1) {
+      if (format == OutputFormat.jpeg) {
+        image = await screenshotController.capture(pixelRatio: pixelRatio);
       }
+    } else if (layers.length == 1) {
+      image = (layers.first as BackgroundLayerData).image.bytes;
     }
 
     // conversion for non-png
@@ -215,6 +223,7 @@ class _SingleImageEditorState extends State<SingleImageEditor> with WidgetsBindi
     undoLayers.clear();
 
     layers.add(layer);
+    // tempLayers.add(layer);
 
     setState(() {});
   }
@@ -229,6 +238,13 @@ class _SingleImageEditorState extends State<SingleImageEditor> with WidgetsBindi
         bottomLeft: Radius.circular(left ? 19 : 0),
       ),
     );
+  }
+
+  removeTextField() {
+    if (layers.last is TextFieldLayerData) {
+      layers.removeLast();
+      setState(() {});
+    }
   }
 
   @override
@@ -259,7 +275,7 @@ class _SingleImageEditorState extends State<SingleImageEditor> with WidgetsBindi
               color: Colors.black,
             ),
             titleSpacing: 0,
-            title: appBarTitle(),
+            title: (layers.isEmpty || layers.last is! TextFieldLayerData) ? appBarTitle() : textFieldAppBar(),
           ),
           body: _isLoading
               ? const Center(
@@ -312,8 +328,6 @@ class _SingleImageEditorState extends State<SingleImageEditor> with WidgetsBindi
                         ),
                       ),
                     ),
-
-                    // 추가한 레이어가 있으면
                     if (layers.length > 1)
                       Positioned(
                         bottom: 64,
@@ -326,7 +340,6 @@ class _SingleImageEditorState extends State<SingleImageEditor> with WidgetsBindi
                           child: IconButton(
                             iconSize: 20,
                             onPressed: () {
-                              // 추가한 레이어 데이터 바텀시트
                               showModalBottomSheet(
                                 shape: const RoundedRectangleBorder(
                                   borderRadius: BorderRadius.only(
@@ -348,8 +361,6 @@ class _SingleImageEditorState extends State<SingleImageEditor> with WidgetsBindi
                           ),
                         ),
                       ),
-
-                    // 축소 확대 초기화
                     if (scaleFactor != 1)
                       Positioned(
                         bottom: 64,
@@ -386,20 +397,18 @@ class _SingleImageEditorState extends State<SingleImageEditor> with WidgetsBindi
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // ############# 자르기 #############
-                  bottomButton(
-                    Icons.crop,
-                    i18n('자르기'),
-                    () async {
+                  BottomButton(
+                    icon: Icons.crop,
+                    text: i18n('자르기'),
+                    onTap: () async {
+                      removeTextField();
+
                       List<Layer> newLayers = [];
                       List<int> newIndex = [];
 
-                      // 백그라운드라 이미지 두 레이어를 제외한 나머지는 자르기 기능이 필요 없을거 같음
-                      // 추가한 레이어가 있으면
                       if (layers.length > 1) {
-                        // 첫번째는 무조건 백그라운드 이미지여서 고정적으로 add
                         newLayers.add(layers.first);
                         for (int i = 0; i < layers.length; i++) {
-                          // 이후 이미지만 골라서 add
                           if (layers[i] is ImageLayerData) {
                             newLayers.add(layers[i]);
                             newIndex.add(i);
@@ -426,8 +435,10 @@ class _SingleImageEditorState extends State<SingleImageEditor> with WidgetsBindi
                           ),
                         ).then(
                           (value) async {
-                            // 이미지를 자르고 나왔을 경우
                             if (value != null) {
+                              // userInfoProvider.flipValue[index] = 0;
+                              // userInfoProvider.rotateValue[index] = 0;
+
                               var imageItem = ImageItem(value[0]);
                               await imageItem.loader.future;
 
@@ -466,10 +477,10 @@ class _SingleImageEditorState extends State<SingleImageEditor> with WidgetsBindi
                     },
                   ),
                   // ############# 텍스트 #############
-                  bottomButton(
-                    Icons.text_fields,
-                    i18n('텍스트'),
-                    () async {
+                  BottomButton(
+                    icon: Icons.text_fields,
+                    text: i18n('텍스트'),
+                    onTap: () async {
                       TextLayerData? layer = await Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -482,19 +493,19 @@ class _SingleImageEditorState extends State<SingleImageEditor> with WidgetsBindi
                     },
                   ),
                   // ############# 반전 #############
-                  bottomButton(
-                    Icons.flip,
-                    i18n('반전'),
-                    () {
+                  BottomButton(
+                    icon: Icons.flip,
+                    text: i18n('반전'),
+                    onTap: () {
                       flipValue = flipValue == 0 ? math.pi : 0;
                       setState(() {});
                     },
                   ),
                   // ############# 회전 #############
-                  bottomButton(
-                    Icons.rotate_left,
-                    i18n('회전'),
-                    () {
+                  BottomButton(
+                    icon: Icons.rotate_left,
+                    text: i18n('회전'),
+                    onTap: () {
                       duration = 400;
                       var t = currentImage.width;
                       currentImage.width = currentImage.height;
@@ -505,10 +516,10 @@ class _SingleImageEditorState extends State<SingleImageEditor> with WidgetsBindi
                     },
                   ),
                   // ############# 회전 #############
-                  bottomButton(
-                    Icons.rotate_right,
-                    i18n('회전'),
-                    () {
+                  BottomButton(
+                    icon: Icons.rotate_right,
+                    text: i18n('회전'),
+                    onTap: () {
                       duration = 400;
                       var t = currentImage.width;
                       currentImage.width = currentImage.height;
@@ -519,16 +530,26 @@ class _SingleImageEditorState extends State<SingleImageEditor> with WidgetsBindi
                     },
                   ),
                   // ############# 필터 #############
-                  bottomButton(
-                    Icons.color_lens,
-                    i18n('필터'),
-                    () async {
+                  BottomButton(
+                    icon: Icons.color_lens,
+                    text: i18n('필터'),
+                    onTap: () async {
+                      removeTextField();
                       resetTransformation();
 
                       var loadingScreen = showLoadingScreen(context); // 로딩 ON
                       var mergedImage = await getMergedImage(); // overlay된 이미지들 병합
 
                       int filterIndex = -1;
+
+                      // 이미 적용한 필터가 있는지 확인 (* 있다면 layers의 몇번째에 있는지 index 추출)
+                      bool hasFilterLayer = layers.any((layer) {
+                        bool isFilter = layer.runtimeType == FilterLayerData;
+                        if (isFilter) {
+                          filterIndex = layers.indexOf(layer);
+                        }
+                        return isFilter;
+                      });
 
                       if (!mounted) return;
 
@@ -541,44 +562,32 @@ class _SingleImageEditorState extends State<SingleImageEditor> with WidgetsBindi
                           ),
                         ),
                       );
-
-                      // 이미 적용한 필터가 있는지 확인 (* 있다면 layers의 몇번째에 있는지 index 추출)
-                      bool hasFilterLayer = layers.any((layer) {
-                        bool isFilter = layer.runtimeType == FilterLayerData;
-                        if (isFilter) {
-                          filterIndex = layers.indexOf(layer);
-                        }
-                        return isFilter;
-                      });
-
                       loadingScreen.hide(); // 로딩 OFF
 
                       // 적용한 필터가 있으면
                       if (filter != null) {
                         // 필터 적용
-                        selectedFilterColor = filter;
 
-                        final filterLayer = FilterLayerData(
-                          image: currentImage,
-                          filterColor: filter,
-                        );
-
+                        // 이전에 적용했던 필더가 있으면 삭제 후 다시 추가
                         if (hasFilterLayer) {
-                          // 이전에 적용했던 필더가 있으면 그 자리를 새로운 필터로 대체
-                          layers[filterIndex] = filterLayer;
-                        } else {
-                          // 아니면 추가
-                          layers.add(filterLayer);
+                          layers.removeAt(filterIndex);
                         }
-                        setState(() {});
+                        layers.add(
+                          FilterLayerData(
+                            image: currentImage,
+                            filterColor: filter,
+                          ),
+                        );
                       }
                     },
                   ),
                   // ############# 이모지 #############
-                  bottomButton(
-                    FontAwesomeIcons.faceSmile,
-                    i18n('이모지'),
-                    () async {
+                  BottomButton(
+                    icon: FontAwesomeIcons.faceSmile,
+                    text: i18n('이모지'),
+                    onTap: () async {
+                      removeTextField();
+
                       EmojiLayerData? layer = await showModalBottomSheet(
                         context: context,
                         backgroundColor: Colors.black,
@@ -593,10 +602,13 @@ class _SingleImageEditorState extends State<SingleImageEditor> with WidgetsBindi
                     },
                   ),
                   // ############# 사진 #############
-                  bottomButton(
-                    FontAwesomeIcons.image,
-                    i18n('사진'),
-                    () async {
+                  BottomButton(
+                    icon: FontAwesomeIcons.image,
+                    text: i18n('사진'),
+                    // icon: const Icon(Icons.photo, color: Colors.white),
+                    onTap: () async {
+                      removeTextField();
+
                       if (await Permission.photos.isPermanentlyDenied) {
                         openAppSettings();
                       }
@@ -607,10 +619,13 @@ class _SingleImageEditorState extends State<SingleImageEditor> with WidgetsBindi
 
                       if (image == null) return;
 
+                      // loadImage(image);
+
                       var imageItem = ImageItem(image);
                       await imageItem.loader.future;
 
                       layers.add(ImageLayerData(image: imageItem));
+                      // tempLayers.add(ImageLayerData(image: imageItem));
                       setState(() {});
                     },
                   ),
@@ -626,63 +641,187 @@ class _SingleImageEditorState extends State<SingleImageEditor> with WidgetsBindi
   Widget appBarTitle() {
     return Row(
       children: [
-        const BackButton(
-          color: Colors.white,
+        Row(
+          children: [
+            const SizedBox(width: 11),
+            InkWell(
+              borderRadius: BorderRadius.circular(50),
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: SizedBox(
+                height: 34,
+                child: Row(
+                  children: [
+                    const SizedBox(width: 5),
+                    Container(
+                      width: 24,
+                      height: 24,
+                      padding: const EdgeInsets.fromLTRB(6, 3, 6, 3),
+                      child: Image.asset(
+                        'assets/travel/backButton.png',
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
+        SizedBox(
+          width: MediaQuery.of(context).size.width - 48,
+          child: SingleChildScrollView(
+            reverse: true,
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                IconButton(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  icon: Icon(Icons.undo, color: layers.length > 1 ? Colors.white : Colors.grey),
+                  onPressed: () {
+                    if (layers.length <= 1) return; // do not remove image layer
+                    Layer removedLayer = layers.removeLast();
+
+                    undoLayers.add(removedLayer);
+
+                    setState(() {});
+                  },
+                ),
+                IconButton(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  icon: Icon(Icons.redo, color: undoLayers.isNotEmpty ? Colors.white : Colors.grey),
+                  onPressed: () {
+                    if (undoLayers.isEmpty) return;
+                    Layer redoLayer = undoLayers.removeLast();
+
+                    layers.add(redoLayer);
+
+                    setState(() {});
+                  },
+                ),
+                Opacity(
+                  opacity: 1,
+                  child: IconButton(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    icon: const Icon(Icons.refresh_outlined, color: Colors.white),
+                    onPressed: () async {
+                      // DialogComponent.dialogComponent(
+                      //   context,
+                      //   Text(style: TextStyle(fontSize: ),
+                      //     '사진 초기화'.,
+                      //     17,
+                      //     fontWeight: FontWeight.w500,
+                      //     textAlign: TextAlign.left,
+                      //   ),
+                      //   Padding(
+                      //     padding: const EdgeInsets.only(left: 25, right: 25),
+                      //     child: Text(style: TextStyle(fontSize: ),
+                      //       '사진을 초기화하고 다시 선택하시겠습니까?'.,
+                      //       14,
+                      //       fontWeight: FontWeight.w500,
+                      //       textAlign: TextAlign.left,
+                      //     ),
+                      //   ),
+                      //   false,
+                      //   [() => Navigator.pop(context), '아니오', Colors.red],
+                      //   [
+                      //     () async {
+                      //       Navigator.pop(context);
+                      //       getImage();
+                      //     },
+                      //     '예',
+                      //     Colors.blue
+                      //   ],
+                      // );
+                    },
+                  ),
+                ),
+                IconButton(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  icon: const Icon(Icons.check, color: Colors.white),
+                  onPressed: () async {
+                    resetTransformation();
+                    setState(() {});
+
+                    var loadingScreen = showLoadingScreen(context);
+
+                    var editedImageBytes = await getMergedImage(widget.outputFormat);
+
+                    loadingScreen.hide();
+
+                    if (mounted) Navigator.pop(context, editedImageBytes);
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget textFieldAppBar() {
+    return Row(
+      children: [
+        const SizedBox(width: 11),
+        InkWell(
+          borderRadius: BorderRadius.circular(50),
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: SizedBox(
+            height: 34,
+            child: Row(
+              children: [
+                const SizedBox(width: 5),
+                Container(
+                  width: 24,
+                  height: 24,
+                  padding: const EdgeInsets.fromLTRB(6, 3, 6, 3),
+                  child: Image.asset(
+                    'assets/travel/backButton.png',
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 5),
+              ],
+            ),
+          ),
         ),
         Expanded(child: Container()),
-        IconButton(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          icon: Icon(Icons.undo, color: layers.length > 1 ? Colors.white : Colors.grey),
-          onPressed: () {
-            if (layers.length <= 1) return; // do not remove image layer
-            Layer removedLayer = layers.removeLast();
-
-            if (removedLayer is FilterLayerData) {
-              undoFilterColor = selectedFilterColor;
-              selectedFilterColor = PresetFilters.none;
-              setState(() {});
-            }
-
-            undoLayers.add(removedLayer);
-
+        InkWell(
+          borderRadius: BorderRadius.circular(50),
+          onTap: () {
+            // Navigator.pop(context);
+            layers.last = TextLayerData(
+              text: (layers.last as TextFieldLayerData).controller.text,
+              background: Colors.transparent,
+              color: Colors.white,
+              size: 32,
+              align: TextAlign.left,
+            );
             setState(() {});
           },
+          child: const SizedBox(
+            height: 34,
+            child: Row(
+              children: [
+                SizedBox(width: 5),
+                Text(
+                  '완료',
+                  style: TextStyle(
+                    fontSize: 17,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(width: 5),
+              ],
+            ),
+          ),
         ),
-        IconButton(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          icon: Icon(Icons.redo, color: undoLayers.isNotEmpty ? Colors.white : Colors.grey),
-          onPressed: () {
-            if (undoLayers.isEmpty) return;
-            Layer redoLayer = undoLayers.removeLast();
-
-            if (redoLayer is FilterLayerData) {
-              selectedFilterColor = undoFilterColor;
-              undoFilterColor = PresetFilters.none;
-            }
-
-            layers.add(redoLayer);
-
-            setState(() {});
-          },
-        ),
-        IconButton(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          icon: const Icon(Icons.check, color: Colors.white),
-          onPressed: () async {
-            previousLayer = [];
-            previousLayer = List.from(layers);
-            resetTransformation();
-            setState(() {});
-
-            var loadingScreen = showLoadingScreen(context);
-
-            var editedImageBytes = await getMergedImage(widget.outputFormat);
-
-            loadingScreen.hide();
-
-            if (mounted) Navigator.pop(context, editedImageBytes);
-          },
-        ),
+        const SizedBox(width: 11),
       ],
     );
   }
@@ -712,32 +851,6 @@ class _SingleImageEditorState extends State<SingleImageEditor> with WidgetsBindi
       setState(() {});
     }
   }
-
-  Widget bottomButton(IconData icon, String text, VoidCallback? onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: Column(
-          children: [
-            Icon(
-              icon,
-              color: Colors.white,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              text,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 class FilterLayerData extends Layer {
@@ -764,4 +877,18 @@ class FilterLayerData extends Layer {
       'filter': filterColor,
     };
   }
+}
+
+class TextFieldLayerData extends Layer {
+  TextEditingController controller;
+  FocusNode focusNode;
+  double size;
+  double? imageWidth;
+
+  TextFieldLayerData({
+    required this.controller,
+    required this.focusNode,
+    required this.size,
+    this.imageWidth,
+  });
 }

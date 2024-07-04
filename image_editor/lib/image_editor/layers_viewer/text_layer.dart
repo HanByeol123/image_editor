@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:image_editor/home.dart';
 import 'package:image_editor/image_editor/layers_viewer/text_layer_overlay.dart';
-import 'package:image_editor/main.dart';
 import 'package:image_editor_plus/data/layer.dart';
 
 /// Text layer
@@ -73,24 +73,22 @@ class _TextViewState extends State<TextLayer> {
                 setState(() {});
               }
             : null,
-        child: selectedFilterColor.build(
-          Transform.rotate(
-            angle: widget.layerData.rotation,
+        child: Transform.rotate(
+          angle: widget.layerData.rotation,
+          child: Container(
+            padding: const EdgeInsets.all(64),
             child: Container(
-              padding: const EdgeInsets.all(64),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: widget.layerData.background.withOpacity(widget.layerData.backgroundOpacity),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  widget.layerData.text.toString(),
-                  textAlign: widget.layerData.align,
-                  style: TextStyle(
-                    color: widget.layerData.color,
-                    fontSize: widget.layerData.size,
-                  ),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: widget.layerData.background.withOpacity(widget.layerData.backgroundOpacity),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                widget.layerData.text.toString(),
+                textAlign: widget.layerData.align,
+                style: TextStyle(
+                  color: widget.layerData.color,
+                  fontSize: widget.layerData.size,
                 ),
               ),
             ),
